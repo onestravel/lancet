@@ -20,7 +20,6 @@ import me.ele.lancet.plugin.Util;
 import me.ele.lancet.plugin.internal.context.ClassFetcher;
 import me.ele.lancet.weaver.ClassData;
 import me.ele.lancet.weaver.Weaver;
-import me.ele.lancet.weaver.internal.log.Log;
 
 /**
  * Created by gengwanpeng on 17/5/4.

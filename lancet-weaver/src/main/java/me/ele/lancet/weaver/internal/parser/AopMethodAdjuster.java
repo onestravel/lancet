@@ -4,6 +4,7 @@ import me.ele.lancet.base.Origin;
 import me.ele.lancet.base.This;
 import me.ele.lancet.weaver.internal.util.PrimitiveUtil;
 import me.ele.lancet.weaver.internal.util.TypeUtil;
+
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
@@ -12,10 +13,24 @@ import org.objectweb.asm.tree.*;
  * Created by gengwanpeng on 17/3/28.
  */
 public class AopMethodAdjuster {
-
-    public static final int OP_CALL = Integer.MAX_VALUE;
-    public static final int OP_THIS_GET_FIELD = OP_CALL - 1;
-    public static final int OP_THIS_PUT_FIELD = OP_THIS_GET_FIELD - 1;
+    /**
+     * implementation "org.ow2.asm:asm-all:$asm_version"
+     * 调整如下:
+     * implementation "org.ow2.asm:asm:$asm_version"
+     * implementation "org.ow2.asm:asm-tree:$asm_version"
+     * implementation "org.ow2.asm:asm-util:$asm_version"
+     * implementation "org.ow2.asm:asm-commons:$asm_version"
+     * implementation "org.ow2.asm:asm-analysis:$asm_version"
+     * 后
+     * <p>
+     * OP_CALL = Integer.MAX_VALUE; 时 操作码对不上
+     * <p>
+     * 调整
+     * OP_CALL = Integer.MIN_VALUE;是 操作码正常
+     */
+    public static final int OP_CALL = Integer.MIN_VALUE;
+    public static final int OP_THIS_GET_FIELD = OP_CALL + 1;
+    public static final int OP_THIS_PUT_FIELD = OP_THIS_GET_FIELD + 1;
 
     public static final String JAVA_LANG_OBJECT = "java/lang/Object";
 
@@ -197,9 +212,7 @@ public class AopMethodAdjuster {
         private void removeBox(AbstractInsnNode previous) {
             if (previous instanceof MethodInsnNode) {
                 MethodInsnNode node = (MethodInsnNode) previous;
-                if (node.getOpcode() == Opcodes.INVOKESTATIC
-                        && node.name.equals("valueOf")
-                        && PrimitiveUtil.boxedTypes().contains(node.owner)) {
+                if (node.getOpcode() == Opcodes.INVOKESTATIC && node.name.equals("valueOf") && PrimitiveUtil.boxedTypes().contains(node.owner)) {
                     methodNode.instructions.remove(previous);
                 }
             }

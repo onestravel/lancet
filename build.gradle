@@ -13,16 +13,17 @@ buildscript {
             bintrayKey = properties.getProperty('bintrayKey')
         }
         lancet_group = 'me.ele'
-        lancet_version = '1.0.6'
+        lancet_version = '1.0.7'
         //lancet_version = '0.0.1.8-SNAPSHOT'
 
-        asm_version = '6.0_BETA'
+        asm_version = '9.1'
         //android_tools_version = '2.4.0-alpha6'
-        android_tools_version = '3.3.2'
-        guava_version = '24.0'
+        android_tools_version = '7.3.0'
+        guava_version = '26.0-jre'
     }
     repositories {
-        jcenter()
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
         mavenCentral()
         maven {
             if (ele) {
@@ -43,17 +44,27 @@ buildscript {
     }
 }
 
+
+allprojects {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        mavenCentral()
+    }
+}
+
 subprojects { pro ->
 
     repositories {
-        jcenter()
+        maven { url 'https://maven.aliyun.com/repository/jcenter' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
         mavenCentral()
         maven {
             url 'https://maven.google.com'
         }
     }
 
-    if (pro.name == 'sample-test')return
+    if (pro.name == 'sample-test') return
 
     version = lancet_version
     group = lancet_group
@@ -72,64 +83,22 @@ subprojects { pro ->
             sources = true
         }
     } else {
-        apply plugin: 'maven'
-        apply plugin: 'com.jfrog.bintray'
+        apply plugin: 'maven-publish'
         afterEvaluate {
-            task sourcesJar(type: Jar) {
-                from sourceSets.main.java.srcDirs
-                classifier = 'sources'
-            }
-
-            task javadocJar(type: Jar, dependsOn: javadoc) {
-                classifier = 'javadoc'
-                from javadoc.destinationDir
-            }
-
-            artifacts {
-                archives sourcesJar
-                archives javadocJar
-            }
-            tasks.install {
-                repositories.mavenInstaller {
-                    pom {
-                        project {
-                            packaging 'jar'
-                            licenses {
-                                license {
-                                    name 'The Apache Software License, Version 2.0'
-                                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                                }
-                            }
-                            developers {
-                                developer {
-                                    id 'dieyidezui'
-                                    name '耿万鹏'
-                                    email 'dieyidezui@gmail.com'
-                                }
-                                developer {
-                                    id 'jude95'
-                                    name '朱晨曦'
-                                    email '973829691@qq.com'
-                                }
-                            }
-                        }
+            publishing {
+                publications {
+                    release(MavenPublication) {
+                        groupId lancet_group
+                        artifactId pro.name
+                        version lancet_version
+                        from components.java
                     }
                 }
-            }
-        }
-        bintray {
-            user = bintrayUser
-            key = bintrayKey
-            configurations = ['archives']
-            pkg {
-                userOrg = "eleme-mt-arch"
-                repo = "maven"
-                userOrg = "eleme-mt-arch"
-                name = pro.name    //发布到JCenter上的项目名字
-                websiteUrl = "https://github.com/eleme/lancet"
-                vcsUrl = "git@github.com:eleme/lancet.git"
-                licenses = ["Apache-2.0"]
-                publish = true
+                repositories {
+                    maven {
+                        url = file("${project.rootDir}/repos")
+                    }
+                }
             }
         }
     }
@@ -147,7 +116,7 @@ task uploadAll { task ->
 
         project.subprojects {
             if (it.name != 'sample-test') {
-                Task upload = !ele ? it.tasks.bintrayUpload : it.tasks.uploadArchives;
+                Task upload = !ele ? it.tasks.publish : it.tasks.uploadArchives;
                 task.dependsOn upload
                 upload.mustRunAfter project.tasks.build
             }

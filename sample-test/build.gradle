@@ -1,25 +1,36 @@
 apply plugin: 'java'
 
 dependencies {
-    compile project(":lancet-base")
-    testCompile project(":lancet-plugin")
-    testCompile "com.android.tools.build:gradle:$android_tools_version"
-    testCompile "junit:junit:4.12"
-    testCompile 'com.squareup.okio:okio:1.11.0'
-    testCompile 'org.assertj:assertj-core:3.6.2'
-    testCompile 'org.mockito:mockito-core:2.8.47'
+    implementation project(":lancet-base")
+    implementation gradleApi()
+    testImplementation project(":lancet-plugin")
+    implementation project(':lancet-weaver')
+    implementation project(':lancet-base')
+//    implementation "org.ow2.asm:asm-all:$asm_version"
+    implementation "org.ow2.asm:asm:$asm_version"
+    implementation "org.ow2.asm:asm-tree:$asm_version"
+    implementation "org.ow2.asm:asm-util:$asm_version"
+    implementation "org.ow2.asm:asm-commons:$asm_version"
+    implementation "org.ow2.asm:asm-analysis:$asm_version"
+
+    testImplementation "com.android.tools.build:gradle:$android_tools_version"
+    testImplementation "junit:junit:4.12"
+    testImplementation 'com.squareup.okio:okio:1.11.0'
+    testImplementation 'org.assertj:assertj-core:3.6.2'
+    testImplementation 'org.mockito:mockito-core:4.8.0'
+    testImplementation "com.google.guava:guava:$guava_version"
 }
 
 
-task executeTestSample(type:JavaExec) {
+task executeTestSample(type: JavaExec) {
     main = "com.sample.playground.Main"
     classpath = files('build/classes/java/main')
 }
 
-task executeTestSampleProduct(type:JavaExec) {
+task executeTestSampleProduct(type: JavaExec) {
     main = "com.sample.playground.Main"
     classpath = files('build/product/java/main')
 }
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11

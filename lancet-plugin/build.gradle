@@ -1,17 +1,20 @@
 apply plugin: 'java'
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile gradleApi()
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation gradleApi()
     compileOnly "com.android.tools.build:gradle:$android_tools_version"
-    compile "com.google.code.gson:gson:2.8.0"
-    compile project(':lancet-weaver')
-    testCompile gradleTestKit()
-    testCompile 'junit:junit:4.12'
+    implementation 'com.android.tools:common:30.3.0'
+    implementation "com.google.code.gson:gson:2.8.0"
+    implementation "commons-io:commons-io:2.4"
+    implementation project(':lancet-weaver')
+    implementation project(':lancet-base')
+    testImplementation gradleTestKit()
+    testImplementation 'junit:junit:4.12'
 }
 
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
 
 task createClasspathManifest {
     def outputDir = file("$buildDir/$name")
@@ -26,5 +29,5 @@ task createClasspathManifest {
 }
 
 dependencies {
-    testRuntime files(createClasspathManifest)
+//    testRuntime files(createClasspathManifest)
 }
