@@ -27,7 +27,7 @@ public class LocalCache {
     // Persistent storage for metas
     private File localCache;
     private final Metas metas;
-    private Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     public LocalCache(File dir) {
         localCache = new File(dir, "buildCache.json");
@@ -38,7 +38,12 @@ public class LocalCache {
         if (localCache.exists() && localCache.isFile()) {
             try {
                 Reader reader = Files.newReader(localCache, Charsets.UTF_8);
-                return gson.fromJson(reader, Metas.class).withoutNull();
+                //gson版本被覆盖后可能存在空指针问题
+                Metas metas = gson.fromJson(reader, Metas.class);
+                if (metas == null) {
+                    return new Metas();
+                }
+                return metas.withoutNull();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             } catch (JsonParseException e) {
@@ -66,13 +71,13 @@ public class LocalCache {
 
     /**
      * if hook class has modified.
+     *
      * @param context TransformContext for this compile
      * @return true if hook class hasn't modified.
      */
     public boolean isHookClassModified(TransformContext context) {
         List<String> hookClasses = metas.jarsWithHookClasses;
-        return Stream.concat(context.getRemovedJars().stream(), context.getChangedJars().stream())
-                .anyMatch(jarInput -> hookClasses.contains(jarInput.getFile().getAbsolutePath()));
+        return Stream.concat(context.getRemovedJars().stream(), context.getChangedJars().stream()).anyMatch(jarInput -> hookClasses.contains(jarInput.getFile().getAbsolutePath()));
     }
 
     public void accept(MetaGraphGeneratorImpl graph) {
