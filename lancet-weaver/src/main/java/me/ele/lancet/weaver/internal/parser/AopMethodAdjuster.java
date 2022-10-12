@@ -178,7 +178,7 @@ public class AopMethodAdjuster {
         @Override
         public AbstractInsnNode replace(MethodInsnNode node) {
             if (TypeUtil.isStatic(methodNode.access)) {
-                illegalState("static method shouldn't call This's function");
+                illegalState("static method shouldn't call This's function(This.get/getField/putField)");
             }
             switch (node.name) {
                 case "get":
