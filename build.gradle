@@ -18,7 +18,8 @@ buildscript {
 
         asm_version = '9.1'
         //android_tools_version = '2.4.0-alpha6'
-        android_tools_version = '7.3.0'
+//        android_tools_version = '7.3.0'
+        android_tools_version = '4.1.2'
         guava_version = '26.0-jre'
     }
     repositories {
